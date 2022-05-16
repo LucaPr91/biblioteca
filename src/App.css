@@ -1,5 +1,12 @@
 .App {
   text-align: center;
+  align-items: center;
+}
+
+#menu{
+  position:fixed; 
+  left:0;
+  top:0
 }
 
 .App-logo {

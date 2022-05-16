@@ -1,0 +1,21 @@
+.home{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#background{
+    background-image: url('../images/library.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 500px;
+    width: 650px;
+}
+
+.buttons{
+    width: 30%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;   
+    align-items: center;
+}

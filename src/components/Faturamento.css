@@ -1,0 +1,55 @@
+.clientes{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.formulario{
+    margin: 20px;
+}
+
+.input{
+    text-align: left;
+    margin: 0 auto;
+    width: 60%;
+    flex-direction: row;
+}
+
+.btnAcao{
+    text-align: right;
+    margin-right: 400px;
+}
+
+h1{
+    margin: 20px;
+}
+
+.form{
+    width: 45%;
+}
+
+.btn{
+    margin: 20px;
+
+}
+
+.tabela{
+    width: 60%;
+    margin: 0 auto;
+    height: 500px;
+}
+
+.acao{
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+.styleBtn{
+    margin: 0 5px;
+}
+
+.btnBottom{
+    text-align: right;
+    margin-right: 400px;
+}
