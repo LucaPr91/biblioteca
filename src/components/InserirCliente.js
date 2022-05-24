@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, Modal } from 'react-bootstrap';
 import { ImFloppyDisk } from 'react-icons/im';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
@@ -39,7 +39,6 @@ function InserirCliente() {
     setLocalStorageClientes(db_clientes);
     handleClose();
     limparFormulario();
-    window.location.reload(false);
   }
 
 

@@ -25,12 +25,6 @@ function Livros() {
   function setLocalStorageLivros(db_livros) {
     return localStorage.setItem('db_livros', JSON.stringify(db_livros))
   }
-
-  function readLivros() {
-    let livros = Array.from(getLocalStorageLivros())
-    return livros
-  };
-
     //buscar livro
     function pesquisarLivro(id) {
       const db_livros = readLivros();
@@ -41,6 +35,10 @@ function Livros() {
       }
     }
 
+    function readLivros() {
+      let livros = Array.from(getLocalStorageLivros())
+      return livros
+    };
 
   //CRUD
 
@@ -120,7 +118,7 @@ function Livros() {
                   <td>inserir algo relacionado a retirada</td>
                   <td className='acao' ><Button className='styleBtn' variant="secondary" onClick={() => editarLivro(l.id)}><ImPencil /></Button>
                     <Button className='styleBtn' variant="danger" onClick={() => excluirLivro(l.id)}><FaTrash /></Button></td>
-                    <td><EmprestarLivro /></td>
+                    <td><EmprestarLivro livro={l} /></td>
 
                 </tr>
               )

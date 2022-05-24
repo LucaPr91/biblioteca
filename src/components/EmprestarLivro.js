@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, Modal } from 'react-bootstrap';
 import { ImFloppyDisk } from 'react-icons/im';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { BiPlusCircle } from 'react-icons/bi';
 import {v4 as uuidv4} from 'uuid';
 import Livros from "./Livros";
+import { keyboard } from "@testing-library/user-event/dist/keyboard";
 
-function EmprestarLivro() {
+function EmprestarLivro(props) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -20,6 +21,7 @@ function EmprestarLivro() {
     setTitulo('');
     setAutor('');
   }
+
 
 
   function getLocalStorageLivros() {
@@ -39,16 +41,16 @@ function EmprestarLivro() {
 
   function clkEmprestar(){
     handleShow();
-    setTitulo(l.id);
+    setTitulo()
   }
 
   //Salvar cliente
   const salvarEmprestimo = () => {
     let emprestimo = {
       id: uuidv4(),
-      idCliente: null,// nomeCliente,,
-      idLivro: null,//tituloLivro,
-      dataEmprestimo: Date.now()
+      idCliente: nome,// nomeCliente,,
+      idLivro: props.livro.id,//tituloLivro,
+      dataEmprestimo: new Date()
     }
     const db_livros = Array.from(getLocalStorageLivros());
     const db_clientes = Array.from(getLocalStorageClientes());
@@ -65,6 +67,11 @@ function EmprestarLivro() {
     return clientes
   };
 
+  function readLivros() {
+    let livros = Array.from(getLocalStorageLivros())
+    return livros
+  };
+
 
   return (
     <>
@@ -76,14 +83,12 @@ function EmprestarLivro() {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group className="mb-3" controlId="Form.CadastroTituloLivro">
+            <Form.Group className="mb-3" controlId="Form.CadastroTituloLivro"/>
               <Form.Label>Título Completo</Form.Label>
               <Form.Control
                 disabled 
-                value={titulo}
-                onChange={(e) => { setTitulo(e.target.value) }}
-              />
-            </Form.Group>
+                value={props.livro.titulo}>
+                </Form.Control>
             <Form.Group
               className="mb-3"
               controlId="Form.CadastroAutorLivro"
