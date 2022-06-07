@@ -39,16 +39,16 @@ function Livros() {
   function pesquisarLivro(titulo, autor) {
     const db_livros = Array.from(getLocalStorageLivros());
     let resultadoPesquisa = [];
-    if (titulo == '' && autor == '') {
+    if (titulo === '' && autor === '') {
       readLivros();
     } else {
       for (let i = 0; i < db_livros.length; i++) {
         let livro = db_livros[i];
-        if (livro.titulo == titulo || livro.autor == autor) {
+        if (livro.titulo === titulo || livro.autor === autor) {
           resultadoPesquisa.push(livro);
         };
       }
-      if (resultadoPesquisa == 0) {
+      if (resultadoPesquisa === 0) {
         alert('Não há itens a serem exibidos. Realize novamente a pesquisa.')
       } else {
         setLivros(resultadoPesquisa);
@@ -66,7 +66,7 @@ function Livros() {
   function excluirLivro(id) {
     const db_livros = Array.from(getLocalStorageLivros());
     for (let i = 0; i < db_livros.length; i++) {
-      if (db_livros[i].id == id) {
+      if (db_livros[i].id === id) {
         db_livros.splice(i, 1);
       }
       setLocalStorageLivros(db_livros);
@@ -78,7 +78,7 @@ function Livros() {
   //buscar livro
   function buscarLivro(idCliente) {
     for (let i = 0; i < livros.length; i++) {
-      if (livros[i].id == idCliente) {
+      if (livros[i].id === idCliente) {
         return { livro: livros[i], index: i };
       };
     }

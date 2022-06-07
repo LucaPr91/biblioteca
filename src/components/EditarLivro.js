@@ -36,7 +36,7 @@ function EditarLivro(props) {
     }
     const db_livros = Array.from(getLocalStorageLivros());
     for (let i = 0; i < db_livros.length; i++) {
-      if (db_livros[i].id == livro.id) {
+      if (db_livros[i].id === livro.id) {
         db_livros[i] = livro;
         setLocalStorageLivros(db_livros);
       }

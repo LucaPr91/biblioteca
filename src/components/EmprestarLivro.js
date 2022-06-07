@@ -1,10 +1,9 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Form, Modal } from 'react-bootstrap';
 import { ImFloppyDisk } from 'react-icons/im';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { v4 as uuidv4 } from 'uuid';
-import Livros from "./Livros";
 
 function EmprestarLivro(props) {
   const [show, setShow] = useState(false);
@@ -14,8 +13,6 @@ function EmprestarLivro(props) {
   const [titulo, setTitulo] = useState('');
   const [autor, setAutor] = useState('');
   const [nome, setNome] = useState('');
-  const [dataPrevistaDevolucao, setDate] = useState(Date);
-  const [dataEmprestimo, setDateEmprestimo] = useState(Date);
 
   function limparFormulario() {
     setTitulo('');
@@ -52,11 +49,12 @@ function EmprestarLivro(props) {
   const salvarEmprestimo = () => {
     let emprestimo = {
       id: uuidv4(),
-      idCliente: nome,// nomeCliente,,
-      idLivro: props.livro.id,//tituloLivro,
+      nomeCliente: nome,// nomeCliente,,
+      tituloLivro: props.livro.titulo,//tituloLivro,
       dataEmprestimo: moment().format('L'),
       dataPrevistaDevolucao: moment().add(7, 'days').calendar(),
-      estaDevolvido: false
+      emprestimoAtivo: true,
+      valor: 7
     }
     const db_livros = Array.from(getLocalStorageLivros());
     const db_clientes = Array.from(getLocalStorageClientes());
@@ -64,9 +62,7 @@ function EmprestarLivro(props) {
     db_emprestimos.push(emprestimo);
     setLocalStorageEmprestimo(db_emprestimos);
     for (let i = 0; i < db_livros.length; i++) {
-      console.log(props.livro.id)
-      console.log(db_livros[i].id)
-      if (db_livros[i].id == props.livro.id) {
+      if (db_livros[i].id === props.livro.id) {
         db_livros[i].estaEmprestado = true;
         setLocalStorageLivros(db_livros);
       }
@@ -105,7 +101,7 @@ function EmprestarLivro(props) {
               <Form.Select value={nome} onChange={(e) => { setNome(e.target.value) }}>
                 {readClientes().map((c) => {
                   return (
-                    <option value={c.id}>{c.nome}</option>
+                    <option value={c.nome}>{c.nome}</option>
                   )
                 })}
               </Form.Select>

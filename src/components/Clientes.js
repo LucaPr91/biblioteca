@@ -35,7 +35,7 @@ function Clientes() {
   function excluirCliente(id) {
     const db_clientes = Array.from(getLocalStorageClientes());
     for (let i = 0; i < db_clientes.length; i++) {
-      if (db_clientes[i].id == id) {
+      if (db_clientes[i].id === id) {
         db_clientes.splice(i, 1);
       }
       setLocalStorageClientes(db_clientes);
@@ -48,16 +48,16 @@ function Clientes() {
   function pesquisarCliente(nome, telefone) {
     const db_clientes = Array.from(getLocalStorageClientes());
     let resultadoPesquisa = [];
-    if (nome == '' && telefone == '') {
+    if (nome === '' && telefone === '') {
       readClientes();
     } else {
       for (let i = 0; i < db_clientes.length; i++) {
         let cliente = db_clientes[i];
-        if (cliente.nome == nome || cliente.telefone == telefone) {
+        if (cliente.nome === nome || cliente.telefone === telefone) {
           resultadoPesquisa.push(cliente);
         };
       }
-      if (resultadoPesquisa == 0) {
+      if (resultadoPesquisa === 0) {
         alert('Não há itens a serem exibidos. Realize novamente a pesquisa.')
       } else {
         setClientes(resultadoPesquisa);

@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
+import moment from "moment";
 import { Button, Table } from "react-bootstrap";
 import { FaTrash } from 'react-icons/fa';
-import { ImPencil, ImSearch } from 'react-icons/im';
+import { ImBook, ImSearch } from 'react-icons/im';
 import { GiMagicBroom } from 'react-icons/gi';
 import './Faturamento.css';
-import InserirRecibo from "./InserirRecibo";
+import { Alert } from "bootstrap";
+import { getAllByPlaceholderText } from "@testing-library/react";
 
 function Faturamento() {
 
   const [nomeCliente, setNomeCliente] = useState('');
-  const [nomeLivro, setNomeLivro] = useState('');
-  const [recibos, setRecibos] = useState([]);
+  const [tituloLivro, setNomeLivro] = useState('');
   const [emprestimos, setEmprestimos] = useState([]);
 
   function limparFormulario() {
@@ -26,12 +27,15 @@ function Faturamento() {
     return JSON.parse(localStorage.getItem('db_emprestimos')) ?? []
   }
 
-  function getLocalStorageRecibos() {
-    return JSON.parse(localStorage.getItem('db_recibos')) ?? []
+  function getLocalStorageLivros() {
+    return JSON.parse(localStorage.getItem('db_livros')) ?? []
   }
-  function setLocalStorageRecibos(db_recibos) {
-    return localStorage.setItem('db_recibos', JSON.stringify(db_recibos))
+  function setLocalStorageLivros(db_livros) {
+    return localStorage.setItem('db_livros', JSON.stringify(db_livros))
   }
+
+
+
 
   useEffect(() => {
     readEmprestimos();
@@ -40,70 +44,47 @@ function Faturamento() {
 
 
   //CRUD
-
-  //Salvar recibo
-  function salvarRecibo() {
-    let recibo = {
-      id: 0,
-      nomeLivro: 'nomeLivro',
-      dataEmprestimo: 'dataEmprestimo',
-      dataDevolucao: 'dataDevolucao',
-      situacao: 'situacao',
-      valor: 'valor'
-    }
-    recibos.push(recibo);
-    setRecibos([...recibos]);
-    limparFormulario();
-  }
-
-  //Excluir recibo
-  function excluirRecibo(id) {
-    for (let i = 0; i < recibos.length; i++) {
-      if (recibos[i].id == id) {
-        recibos.splice(i, 1);
-        break;
+  //Excluir Emprestimo
+  function excluirEmprestimo(id) {
+    const db_emprestimos = Array.from(getLocalStorageEmprestimos());
+    for (let i = 0; i < db_emprestimos.length; i++) {
+      if (db_emprestimos[i].id === id) {
+        db_emprestimos.splice(i, 1);
       }
-      setRecibos([...recibos]);
+      setLocalStorageEmprestimos(db_emprestimos);
+      limparFormulario();
+      readEmprestimos();
     }
   }
 
-  //buscar recibo
-  function buscarRecibo(idRecibo) {
-    for (let i = 0; i < recibos.length; i++) {
-      if (recibos[i].id == idRecibo) {
-        return { recibo: recibos[i], index: i };
-      };
-    }
-  }
-
-  //editar recibo
-  const editarRecibo = (index, recibo) => {
-    const db_recibos = Array.from(getLocalStorageRecibos());
-    db_recibos[index] = recibo;
-    getLocalStorageRecibos(db_recibos);
-    readRecibos();
-  }
-
-  //buscar recibo
-  function pesquisarRecibo(nomeCliente, nomeLivro) {
-    const db_recibos = Array.from(getLocalStorageRecibos());
+  //buscar emprestimo
+  function pesquisarEmprestimo(nomeCliente, tituloLivro) {
+    const db_emprestimos = Array.from(getLocalStorageEmprestimos());
     let resultadoPesquisa = [];
-    if (nomeCliente == '' && nomeLivro == '') {
-      readRecibos();
+    if (nomeCliente === '' && tituloLivro === '') {
+      readEmprestimos();
     } else {
-      for (let i = 0; i < db_recibos.length; i++) {
-        let recibo = db_recibos[i];
-        if (recibo.nomeCliente == nomeCliente || recibo.nomeLivro == nomeLivro) {
-          resultadoPesquisa.push(recibo);
+      for (let i = 0; i < db_emprestimos.length; i++) {
+        let emprestimo = db_emprestimos[i];
+        if (emprestimo.nomeCliente === nomeCliente || emprestimo.tituloLivro === tituloLivro) {
+          resultadoPesquisa.push(emprestimo);
         };
       }
-      if (resultadoPesquisa == 0) {
+      if (resultadoPesquisa === 0) {
         alert('Não há itens a serem exibidos. Realize novamente a pesquisa.')
       } else {
-        setRecibos(resultadoPesquisa);
+        setEmprestimos(resultadoPesquisa);
       }
     }
   }
+
+function validarPrazo(e){
+  if(e.dataPrevistaDevolucao > Date()){
+    alert('Livro devolvido dentro do prazo, obrigado')
+  }else{
+    alert('Você está devolvendo após o prazo previsto, necessário realizar o pagamento de MULTA no valor de R$14,00')
+  }
+}
 
 
   //Pesquisar todos db_emprestimos
@@ -112,11 +93,28 @@ function Faturamento() {
     setEmprestimos(Array.from(getLocalStorageEmprestimos()))
   };
 
-  function readRecibos() {
-    setRecibos(Array.from(getLocalStorageRecibos()))
-  };
+  function devolverLivro(e) {
+    const db_livros = Array.from(getLocalStorageLivros());
+    for (let i = 0; i < db_livros.length; i++) {
+      if (db_livros[i].titulo == tituloLivro) {
+        db_livros[i].estaEmprestado = false;
+        setLocalStorageLivros(db_livros);
+        alert('Livro devolvido, obrigado');
+      }
+    }
+    const db_emprestimos = Array.from(getLocalStorageEmprestimos());
+    validarPrazo(e);
+    for (let i = 0; i < db_emprestimos.length; i++) {
+      if (db_emprestimos[i].id === e.id) {
+        db_emprestimos[i].emprestimoAtivo = false;
+        setLocalStorageEmprestimos(db_emprestimos);
+        alert('Emprestimo finalizado');
+      }
+    }
 
+  }
 
+  const somarValores = emprestimos.map(item => item.valor).reduce((prev, curr) => prev + curr, 0)
 
   return (
     <div className="Faturamento">
@@ -130,21 +128,22 @@ function Faturamento() {
           onChange={(e) => { setNomeCliente(e.target.value) }}
         />
         <input placeholder='Título do Livro'
-          value={nomeLivro}
+          value={tituloLivro}
           onChange={(e) => { setNomeLivro(e.target.value) }}
         />
         <div className='btnAcao'>
           <Button onClick={limparFormulario} variant="secondary" className='btn'><GiMagicBroom /> Limpar</Button>
-          <Button onClick={() => pesquisarRecibo(nomeCliente, nomeLivro)} variant="primary" className='btn'><ImSearch />Pesquisar</Button>
+          <Button onClick={() => pesquisarEmprestimo(nomeCliente, tituloLivro)} variant="primary" className='btn'><ImSearch />Pesquisar</Button>
         </div>
       </div>
       <div className='tabela'>
         <Table striped bordered hover>
           <thead>
             <tr>
+              <th>Cliente</th>
               <th>Livro</th>
               <th>Dt Emprestimo</th>
-              <th>Dt Devolução</th>
+              <th>Dt Prevista de Devolução</th>
               <th>Situação</th>
               <th>Valor</th>
               <th>Ação</th>
@@ -153,24 +152,22 @@ function Faturamento() {
           <tbody>
             {emprestimos.map((e) => {
               return (
-                <tr>
-                  <td>{e.nomeLivro}</td>
+                <tr key={e.id}>
+                  <td>{e.nomeCliente}</td>
+                  <td>{e.tituloLivro}</td>
                   <td>{e.dataEmprestimo}</td>
-                  <td>{e.dataDevolucao}</td>
-                  <td>{e.situacao}</td>
+                  <td>{e.dataPrevistaDevolucao}</td>
+                  <td>{e.dataPrevistaDevolucao < moment().format('L') ? 'Atrasado' : 'Em dia'}</td>
                   <td>{e.valor}</td>
-                  <td className='acao' ><Button className='styleBtn' variant="secondary" onClick={() => editarRecibo(e.id)}><ImPencil /></Button>
-                    <Button className='styleBtn' variant="danger" onClick={() => excluirRecibo(e.id)}><FaTrash /></Button></td>
+                  <td className='acao' ><Button className='styleBtn' variant="secondary" onClick={() => devolverLivro(e)}><ImBook /></Button>
+                    <Button className='styleBtn' variant="danger" onClick={() => excluirEmprestimo(e.id)}><FaTrash /></Button></td>
                 </tr>
               )
             })}
           </tbody>
         </Table>
+        <div className="totais"><p>Valores totais: {somarValores}</p></div>
       </div>
-      <div className='btnBottom'>
-        <InserirRecibo />
-      </div>
-
     </div >
   );
 }

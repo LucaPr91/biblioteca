@@ -41,7 +41,7 @@ function EditarCliente(props) {
     }
     const db_clientes = Array.from(getLocalStorageClientes());
     for (let i = 0; i < db_clientes.length; i++) {
-      if (db_clientes[i].id == cliente.id) {
+      if (db_clientes[i].id === cliente.id) {
         db_clientes[i] = cliente;
         setLocalStorageClientes(db_clientes);
       }
