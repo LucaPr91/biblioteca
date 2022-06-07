@@ -25,7 +25,7 @@ h1{
 }
 
 .form{
-    width: 45%;
+    width: 30%;
 }
 
 .btn{
@@ -34,15 +34,16 @@ h1{
 }
 
 .tabela{
-    width: 60%;
+    width: 65%;
     margin: 0 auto;
-    height: 500px;
+    height: 600px;
 }
 
 .acao{
     display: flex; 
     justify-content: center;
     align-items: center;
+    height: auto;
 }
 
 .styleBtn{

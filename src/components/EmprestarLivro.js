@@ -1,11 +1,10 @@
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Button, Form, Modal } from 'react-bootstrap';
 import { ImFloppyDisk } from 'react-icons/im';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
-import { BiPlusCircle } from 'react-icons/bi';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import Livros from "./Livros";
-import { keyboard } from "@testing-library/user-event/dist/keyboard";
 
 function EmprestarLivro(props) {
   const [show, setShow] = useState(false);
@@ -15,7 +14,8 @@ function EmprestarLivro(props) {
   const [titulo, setTitulo] = useState('');
   const [autor, setAutor] = useState('');
   const [nome, setNome] = useState('');
-
+  const [dataPrevistaDevolucao, setDate] = useState(Date);
+  const [dataEmprestimo, setDateEmprestimo] = useState(Date);
 
   function limparFormulario() {
     setTitulo('');
@@ -39,7 +39,11 @@ function EmprestarLivro(props) {
     return JSON.parse(localStorage.getItem('db_emprestimos')) ?? []
   }
 
-  function clkEmprestar(){
+  function setLocalStorageLivros(db_livros) {
+    return localStorage.setItem('db_livros', JSON.stringify(db_livros))
+  }
+
+  function clkEmprestar() {
     handleShow();
     setTitulo()
   }
@@ -50,16 +54,26 @@ function EmprestarLivro(props) {
       id: uuidv4(),
       idCliente: nome,// nomeCliente,,
       idLivro: props.livro.id,//tituloLivro,
-      dataEmprestimo: new Date()
+      dataEmprestimo: moment().format('L'),
+      dataPrevistaDevolucao: moment().add(7, 'days').calendar(),
+      estaDevolvido: false
     }
     const db_livros = Array.from(getLocalStorageLivros());
     const db_clientes = Array.from(getLocalStorageClientes());
     const db_emprestimos = Array.from(getLocalStorageEmprestimo());
     db_emprestimos.push(emprestimo);
     setLocalStorageEmprestimo(db_emprestimos);
-    handleClose();
-    limparFormulario();
-    window.location.reload(false);
+    for (let i = 0; i < db_livros.length; i++) {
+      console.log(props.livro.id)
+      console.log(db_livros[i].id)
+      if (db_livros[i].id == props.livro.id) {
+        db_livros[i].estaEmprestado = true;
+        setLocalStorageLivros(db_livros);
+      }
+      handleClose();
+      limparFormulario();
+      window.location.reload(false);
+    }
   }
 
   function readClientes() {
@@ -67,15 +81,9 @@ function EmprestarLivro(props) {
     return clientes
   };
 
-  function readLivros() {
-    let livros = Array.from(getLocalStorageLivros())
-    return livros
-  };
-
-
   return (
     <>
-      <Button variant="success" onClick={clkEmprestar}> Emprestar </Button>
+      <Button variant="success" onClick={clkEmprestar} disabled={props.livro.estaEmprestado}> Emprestar </Button>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -83,33 +91,33 @@ function EmprestarLivro(props) {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group className="mb-3" controlId="Form.CadastroTituloLivro"/>
-              <Form.Label>Título Completo</Form.Label>
-              <Form.Control
-                disabled 
-                value={props.livro.titulo}>
-                </Form.Control>
+            <Form.Group className="mb-3" controlId="Form.CadastroTituloLivro" />
+            <Form.Label>Título Completo</Form.Label>
+            <Form.Control
+              disabled
+              value={props.livro.titulo}>
+            </Form.Control>
             <Form.Group
               className="mb-3"
               controlId="Form.CadastroAutorLivro"
             >
               <Form.Label>Cliente</Form.Label>
               <Form.Select value={nome} onChange={(e) => { setNome(e.target.value) }}>
-        {readClientes().map((c) => {
-          return (
-            <option value={c.id}>{c.nome}</option>
-          )
-        })}
-      </Form.Select>
+                {readClientes().map((c) => {
+                  return (
+                    <option value={c.id}>{c.nome}</option>
+                  )
+                })}
+              </Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            <IoIosCloseCircleOutline/>Fechar
+            <IoIosCloseCircleOutline />Fechar
           </Button>
           <Button variant="primary" onClick={() => salvarEmprestimo()} >
-            <ImFloppyDisk/> Confirmar Emprestimo
+            <ImFloppyDisk /> Confirmar Emprestimo
           </Button>
         </Modal.Footer>
       </Modal>

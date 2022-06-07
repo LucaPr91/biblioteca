@@ -5,7 +5,7 @@ import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { BiPlusCircle } from 'react-icons/bi';
 import {v4 as uuidv4} from 'uuid';
 
-function InserirCliente() {
+function InserirRecibo() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -39,7 +39,6 @@ function InserirCliente() {
     setLocalStorageClientes(db_clientes);
     handleClose();
     limparFormulario();
-    window.location.reload();
   }
 
 
@@ -85,4 +84,4 @@ function InserirCliente() {
   );
 }
 
-export default InserirCliente;
+export default InserirRecibo;

@@ -1,11 +1,13 @@
 import { Button, Form, Table } from 'react-bootstrap';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaTrash } from 'react-icons/fa';
 import { ImPencil, ImSearch } from 'react-icons/im';
 import { GiMagicBroom } from 'react-icons/gi';
 import './Livros.css';
 import InserirLivro from './InserirLivro'
 import EmprestarLivro from './EmprestarLivro'
+import EditarCliente from './EditarCliente';
+import EditarLivro from './EditarLivro';
 
 
 function Livros() {
@@ -19,48 +21,59 @@ function Livros() {
     setAutor('');
   }
 
+
+
   function getLocalStorageLivros() {
     return JSON.parse(localStorage.getItem('db_livros')) ?? []
   }
   function setLocalStorageLivros(db_livros) {
     return localStorage.setItem('db_livros', JSON.stringify(db_livros))
   }
-    //buscar livro
-    function pesquisarLivro(id) {
-      const db_livros = readLivros();
+
+  useEffect(() => {
+    readLivros();
+
+  }, [])
+
+  //buscar livro
+  function pesquisarLivro(titulo, autor) {
+    const db_livros = Array.from(getLocalStorageLivros());
+    let resultadoPesquisa = [];
+    if (titulo == '' && autor == '') {
+      readLivros();
+    } else {
       for (let i = 0; i < db_livros.length; i++) {
-        if (db_livros[i].id == id) {
-          return { livro: db_livros[i], index: i };
+        let livro = db_livros[i];
+        if (livro.titulo == titulo || livro.autor == autor) {
+          resultadoPesquisa.push(livro);
         };
       }
+      if (resultadoPesquisa == 0) {
+        alert('Não há itens a serem exibidos. Realize novamente a pesquisa.')
+      } else {
+        setLivros(resultadoPesquisa);
+      }
     }
+  }
 
-    function readLivros() {
-      let livros = Array.from(getLocalStorageLivros())
-      return livros
-    };
+  function readLivros() {
+   setLivros(Array.from(getLocalStorageLivros()));
+  };
 
   //CRUD
 
   //Excluir livro
   function excluirLivro(id) {
-    for (let i = 0; i < livros.length; i++) {
-      if (livros[i].id == id) {
-        livros.splice(i, 1);
+    const db_livros = Array.from(getLocalStorageLivros());
+    for (let i = 0; i < db_livros.length; i++) {
+      if (db_livros[i].id == id) {
+        db_livros.splice(i, 1);
       }
-      setLivros([...livros]);
+      setLocalStorageLivros(db_livros);
+      limparFormulario();
+      readLivros();
     }
   }
-
-  //editar cliente
-  function editarLivro() {
-
-  }
-
-  function emprestarLivro(){
-    
-  }
-
 
   //buscar livro
   function buscarLivro(idCliente) {
@@ -93,32 +106,30 @@ function Livros() {
         </Form>
         <div className='btnAcao'>
           <Button onClick={limparFormulario} variant="secondary" className='btn'><GiMagicBroom /> Limpar</Button>
-          <Button onClick={pesquisarLivro} variant="primary" className='btn'><ImSearch />Pesquisar</Button>
+          <Button onClick={() => pesquisarLivro(titulo, autor)} variant="primary" className='btn'><ImSearch />Pesquisar</Button>
         </div>
       </div>
       <div className='tabela'>
         <Table striped bordered hover>
           <thead>
             <tr>
-              
+
               <th>Título</th>
               <th>Autor</th>
-              <th>retirada? Dt ou o que?</th>
               <th>Ação</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {readLivros().map((l) => {
+            {livros.map((l) => {
               return (
                 <tr>
-                  
                   <td>{l.titulo}</td>
                   <td>{l.autor}</td>
-                  <td>inserir algo relacionado a retirada</td>
-                  <td className='acao' ><Button className='styleBtn' variant="secondary" onClick={() => editarLivro(l.id)}><ImPencil /></Button>
+                  <td className='acao' >
+                  <EditarLivro livro={l}/>
                     <Button className='styleBtn' variant="danger" onClick={() => excluirLivro(l.id)}><FaTrash /></Button></td>
-                    <td><EmprestarLivro livro={l} /></td>
+                  <td><EmprestarLivro livro={l} /></td>
 
                 </tr>
               )

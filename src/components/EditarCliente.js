@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Form, Modal } from 'react-bootstrap';
 import { ImFloppyDisk } from 'react-icons/im';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
-import { BiPlusCircle } from 'react-icons/bi';
-import {v4 as uuidv4} from 'uuid';
+import { ImPencil } from 'react-icons/im';
 
-function InserirCliente() {
+function EditarCliente(props) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -13,11 +12,17 @@ function InserirCliente() {
   const [telefone, setTelefone,] = useState('');
   const [nome, setNome] = useState('');
 
+  const [clientes, setClientes] = useState([]);
 
   function limparFormulario() {
     setNome('');
     setTelefone('');
   }
+
+  function readClientes() {
+    setClientes(Array.from(getLocalStorageClientes()))
+  };
+
 
 
   function getLocalStorageClientes() {
@@ -27,29 +32,32 @@ function InserirCliente() {
     return localStorage.setItem('db_clientes', JSON.stringify(db_clientes))
   }
 
-  //Salvar cliente
-  const salvarCliente = () => {
+  //Editar cliente
+  const editarClientes = (id) => {
     let cliente = {
-      id: uuidv4(),
+      id: props.cliente.id,
       nome: nome,
       telefone: telefone
     }
     const db_clientes = Array.from(getLocalStorageClientes());
-    db_clientes.push(cliente);
-    setLocalStorageClientes(db_clientes);
-    handleClose();
-    limparFormulario();
-    window.location.reload();
+    for (let i = 0; i < db_clientes.length; i++) {
+      if (db_clientes[i].id == cliente.id) {
+        db_clientes[i] = cliente;
+        setLocalStorageClientes(db_clientes);
+      }
+      readClientes();
+      handleClose();
+      limparFormulario();
+      window.location.reload();
+    }
   }
-
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}> <BiPlusCircle/>Inserir </Button>
-
+      <Button className='styleBtn' variant="secondary" onClick={handleShow} ><ImPencil /></Button>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Novo Cliente</Modal.Title>
+          <Modal.Title>Editar Cliente</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -74,10 +82,10 @@ function InserirCliente() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            <IoIosCloseCircleOutline/>Fechar
+            <IoIosCloseCircleOutline />Fechar
           </Button>
-          <Button variant="primary" onClick={() => salvarCliente()} >
-            <ImFloppyDisk/> Salvar Cliente
+          <Button variant="primary" onClick={() => editarClientes()} >
+            <ImFloppyDisk /> Salvar Cliente
           </Button>
         </Modal.Footer>
       </Modal>
@@ -85,4 +93,4 @@ function InserirCliente() {
   );
 }
 
-export default InserirCliente;
+export default EditarCliente;

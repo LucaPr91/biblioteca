@@ -2,57 +2,56 @@ import React, { useState } from "react";
 import { Button, Form, Modal } from 'react-bootstrap';
 import { ImFloppyDisk } from 'react-icons/im';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
-import { BiPlusCircle } from 'react-icons/bi';
-import {v4 as uuidv4} from 'uuid';
+import { ImPencil } from 'react-icons/im';
 
-function InserirLivro() {
+
+function EditarLivro(props) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   const [titulo, setTitulo] = useState('');
+  const [livros, setLivros] = useState([]);
   const [autor, setAutor] = useState('');
-  const [estaEmprestado, setEstaEmprestado] = useState(false);
 
 
-  function limparFormulario() {
-    setTitulo('');
-    setAutor('');
-  }
+  function readLivros() {
+    setLivros(Array.from(getLocalStorageLivros()));
+   };
 
-
-  function getLocalStorageLivros() {
+   function getLocalStorageLivros() {
     return JSON.parse(localStorage.getItem('db_livros')) ?? []
   }
   function setLocalStorageLivros(db_livros) {
     return localStorage.setItem('db_livros', JSON.stringify(db_livros))
   }
 
-  //Salvar cliente
-  const salvarLivro = () => {
+  //Editar livro
+  const editarLivros = (id) => {
     let livro = {
-      id: uuidv4(),
-      titulo: titulo,
+      id: props.livro.id,
       autor: autor,
-      estaEmprestado: false,
+      titulo: titulo,
+      estaEmprestado: false
     }
     const db_livros = Array.from(getLocalStorageLivros());
-    db_livros.push(livro);
-    setLocalStorageLivros(db_livros);
-    handleClose();
-    limparFormulario();
-    window.location.reload(false);
+    for (let i = 0; i < db_livros.length; i++) {
+      if (db_livros[i].id == livro.id) {
+        db_livros[i] = livro;
+        setLocalStorageLivros(db_livros);
+      }
+      readLivros();
+      handleClose();
+      window.location.reload();
+    }
   }
-
-
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}> <BiPlusCircle/>Inserir </Button>
-
+      <Button className='styleBtn' variant="secondary" onClick={handleShow} disabled={props.livro.estaEmprestado}><ImPencil /></Button>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Novo Livro</Modal.Title>
+          <Modal.Title>Editar Livro</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -60,27 +59,30 @@ function InserirLivro() {
               <Form.Label>Título Completo</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="ex.: Harry Potter e a Pedra Filosofal"
+                placeholder="Ex.:Harry Potter e a Pedra Filosofal"
                 autoFocus
                 value={titulo}
-                onChange={(e) => { setTitulo(e.target.value) }}
+            onChange={(e) => { setTitulo(e.target.value) }}
               />
             </Form.Group>
-            <Form.Group
-              className="mb-3"
-              controlId="Form.CadastroAutorLivro"
-            >
+            <Form.Group className="mb-3" controlId="Form.CadastroAutor">
               <Form.Label>Autor</Form.Label>
-              <Form.Control placeholder="Ex.: J.K.Rownling" value={autor} onChange={(e) => { setAutor(e.target.value) }} />
+              <Form.Control
+                type="text"
+                placeholder="Ex.: J.K.Rownling"
+                autoFocus
+                value={autor}
+                onChange={(e) => { setAutor(e.target.value) }}
+              />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            <IoIosCloseCircleOutline/>Fechar
+            <IoIosCloseCircleOutline />Fechar
           </Button>
-          <Button variant="primary" onClick={() => salvarLivro()} >
-            <ImFloppyDisk/> Salvar Livro
+          <Button variant="primary" onClick={() => editarLivros()} >
+            <ImFloppyDisk /> Salvar Livro
           </Button>
         </Modal.Footer>
       </Modal>
@@ -88,4 +90,4 @@ function InserirLivro() {
   );
 }
 
-export default InserirLivro;
+export default EditarLivro;
